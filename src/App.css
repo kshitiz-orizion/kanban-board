@@ -1,16 +1,17 @@
-body{
-    margin:0
+body {
+    margin: 0
 }
 
 
-*{
-    font-size: 14px;
+* {
     color: #111;
-    font-family:Arial, Helvetica, sans-serif;
-      user-select: none;
-  -webkit-user-select: none; /* For older WebKit-based browsers like Safari */
-  -moz-user-select: none;    /* For older Firefox versions */
-  -ms-user-select: none;  
+    font-family: Arial, Helvetica, sans-serif;
+    user-select: none;
+    -webkit-user-select: none;
+    /* For older WebKit-based browsers like Safari */
+    -moz-user-select: none;
+    /* For older Firefox versions */
+    -ms-user-select: none;
 }
 
 
@@ -46,7 +47,7 @@ body{
     margin-top: 10px;
     border-radius: 6px;
     box-shadow: 0 1px 4px rgba(0, 0, 0, 0.1);
-    
+
 }
 
 .tags {
@@ -74,7 +75,7 @@ body{
     border: 1px solid #ccc;
 }
 
-.mainPage{
+.mainPage {
     padding: 5px;
     margin: 10px;
     display: flex;
@@ -86,4 +87,25 @@ body{
     height: 80%;
     justify-content: center;
     align-items: center;
+}
+
+.boardPageContainer {
+    padding-top: 1rem;
+}
+
+.searchandFilter {
+    display: flex;
+    gap: 1rem;
+    margin-bottom: 1rem;
+}
+
+.undoBanner {
+    margin-bottom: '1rem';
+    background: '#fff3cd';
+    padding: '10px';
+    border: '1px solid #ffeeba';
+}
+
+.undoButton {
+    margin-left: '1rem'
 }

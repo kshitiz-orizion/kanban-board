@@ -2,6 +2,7 @@
 import React, { useEffect } from 'react';
 import { useParams, Link } from 'react-router-dom';
 import { useIssueContext } from '../components/IssueContext'; // ⬅️ Import context
+import { currentUser } from '../constants/currentUser';
 
 export const IssueDetailPage: React.FC = () => {
   const { id } = useParams<{ id: string }>();
@@ -70,18 +71,46 @@ export const IssueDetailPage: React.FC = () => {
           border: 'none',
           padding: '8px 12px',
           borderRadius: '5px',
-          cursor: issue.status === 'Done' ? 'not-allowed' : 'pointer',
+          cursor: issue.status === 'Done' || currentUser.role !== "admin" ? 'not-allowed' : 'pointer',
           opacity: issue.status === 'Done' ? 0.6 : 1,
         }}
-        disabled={issue.status === 'Done'}
+        disabled={issue.status === 'Done' || currentUser.role !== "admin"}
       >
         {issue.status === 'Done' ? 'Resolved' : 'Mark as Resolved'}
       </button>
 
-      <div className="mainPage" style={{ maxWidth: '600px', margin: 'auto', borderTop:'2px solid green' }}>
+      <div className="mainPage" style={{ maxWidth: '600px', margin: 'auto', borderTop: '2px solid green' }}>
         <h2>{issue.title}</h2>
         <p><strong>Status:</strong> {issue.status}</p>
-        <p><strong>Priority:</strong> {issue.priority}</p>
+        <p>
+          <strong>Priority:</strong>{' '}
+          {currentUser.role === 'admin' ? (
+            <select
+              value={issue.priority}
+              onChange={(e) => {
+                const newPriority = e.target.value as 'low' | 'medium' | 'high';
+                setIssues((prev) =>
+                  prev.map((i) =>
+                    i.id === issue.id ? { ...i, priority: newPriority } : i
+                  )
+                );
+              }}
+              style={{
+                padding: '4px',
+                marginLeft: '10px',
+                fontSize: '0.95rem',
+              }}
+            >
+              <option value="low">Low</option>
+              <option value="medium">Medium</option>
+              <option value="high">High</option>
+            </select>
+          ) : (
+            <span style={{ marginLeft: '10px' }}>{issue.priority}</span>
+          )}
+        </p>
+
+        {/* <p><strong>Priority:</strong> {issue.priority}</p> */}
         <p><strong>Severity:</strong> {issue.severity}</p>
         <p><strong>Assignee:</strong> {issue.assignee}</p>
         <p><strong>Created At:</strong> {new Date(issue.createdAt).toLocaleString()}</p>

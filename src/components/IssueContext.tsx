@@ -1,4 +1,4 @@
-// src/context/IssueContext.tsx
+// src/context/Context.tsx
 import React, { createContext, useContext, useState, useEffect } from 'react';
 import { mockFetchIssues } from '../utils/api';
 import { toast } from 'react-toastify';
@@ -14,14 +14,15 @@ export interface Issue {
   tags: string[];
 }
 
-interface IssueContextType {
+
+interface ContextType {
   issues: Issue[];
   setIssues: React.Dispatch<React.SetStateAction<Issue[]>>;
 }
 
-const IssueContext = createContext<IssueContextType | undefined>(undefined);
+const Context = createContext<ContextType | undefined>(undefined);
 
-export const IssueProvider = ({ children }: { children: React.ReactNode }) => {
+export const Provider = ({ children }: { children: React.ReactNode }) => {
   const [issues, setIssues] = useState<Issue[]>([]);
 
   useEffect(() => {
@@ -38,14 +39,14 @@ export const IssueProvider = ({ children }: { children: React.ReactNode }) => {
     };
   
   return (
-    <IssueContext.Provider value={{ issues, setIssues }}>
+    <Context.Provider value={{ issues, setIssues }}>
       {children}
-    </IssueContext.Provider>
+    </Context.Provider>
   );
 };
 
 export const useIssueContext = () => {
-  const context = useContext(IssueContext);
+  const context = useContext(Context);
   if (!context) {
     throw new Error('useIssueContext must be used within an IssueProvider');
   }

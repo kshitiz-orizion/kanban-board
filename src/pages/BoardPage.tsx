@@ -1,9 +1,8 @@
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useRef } from 'react';
+import { Issue, IssueStatus } from '../types'
 import {
   DndContext,
   DragEndEvent,
-  useDraggable,
-  useDroppable,
   useSensor,
   useSensors,
   PointerSensor,
@@ -12,124 +11,20 @@ import {
   KeyboardSensor,
 } from '@dnd-kit/core';
 
-import { mockFetchIssues, mockUpdateIssue } from '../utils/api';
-import { useNavigate } from 'react-router-dom';
+import DroppableColumn from '../components/DropableColumn';
+
+import { currentUser } from '../constants/currentUser'
+import { mockUpdateIssue } from '../utils/api';
+
 import { toast } from 'react-toastify';
 import { useIssueContext } from '../components/IssueContext';
 
 
-interface Issue {
-  id: string;
-  title: string;
-  status: 'Backlog' | 'In Progress' | 'Done';
-  priority: 'low' | 'medium' | 'high';
-  severity: number;
-  createdAt: string;
-  assignee: string;
-  tags: string[];
-}
 
-const statusList: Issue['status'][] = ['Backlog', 'In Progress', 'Done'];
+const statusList: IssueStatus[] = ['Backlog', 'In Progress', 'Done'];
 
-// 🟩 Draggable Card
-const DraggableCard = ({
-  issue,
-  isDraggingGlobal,
-}: {
-  issue: Issue;
-  isDraggingGlobal: boolean;
-}) => {
-  const { attributes, listeners, setNodeRef, transform } = useDraggable({
-    id: issue.id,
-  });
-
-  const navigate = useNavigate();
-  const style = {
-    transform: transform
-      ? `translate(${transform.x}px, ${transform.y}px)`
-      : undefined,
-    cursor: 'grab',
-    borderTop: `2px solid ${
-      issue.status === 'Done'
-        ? '#008000'
-        : issue.status === 'Backlog'
-        ? '#FF0000'
-        : '#FFA500'
-    }`,
-  };
-
-  const handleClick = () => {
-    if (!isDraggingGlobal) {
-      navigate(`/issue/${issue.id}`);
-    }
-  };
-
-  return (
-    <div
-      ref={setNodeRef}
-      {...listeners}
-      {...attributes}
-      style={style}
-      className="kanbanCard"
-      onClick={handleClick}
-    >
-      <h4>{issue.title}</h4>
-      <p>
-        <strong>Priority:</strong> {issue.priority}
-      </p>
-      <p>
-        <strong>Severity:</strong> {issue.severity}
-      </p>
-      <p>
-        <strong>Assignee:</strong> {issue.assignee}
-      </p>
-      <div className="tags">
-        {issue.tags.map(tag => (
-          <span key={tag} className="tag">
-            {tag}
-          </span>
-        ))}
-      </div>
-    </div>
-  );
-};
-
-// 🟦 Droppable Column
-const DroppableColumn = ({
-  status,
-  issues,
-  isDraggingGlobal,
-}: {
-  status: Issue['status'];
-  issues: Issue[];
-  isDraggingGlobal: boolean;
-}) => {
-  const { setNodeRef } = useDroppable({
-    id: status,
-  });
-
-  return (
-    <div ref={setNodeRef} className="kanbanColumn">
-      <h2>{status}</h2>
-      {issues.length > 0 ? (
-        issues.map(issue => (
-          <DraggableCard
-            key={issue.id}
-            issue={issue}
-            isDraggingGlobal={isDraggingGlobal}
-          />
-        ))
-      ) : (
-        <p style={{ color: '#aaa', fontStyle: 'italic' }}>
-          No matching issues
-        </p>
-      )}
-    </div>
-  );
-};
 
 export const BoardPage = () => {
-  // const [issues, setIssues] = useState<Issue[]>([]);
   const { issues, setIssues } = useIssueContext();
 
   const [searchTerm, setSearchTerm] = useState('');
@@ -211,7 +106,6 @@ export const BoardPage = () => {
       const matchesSearch =
         searchTerm.trim() === '' ||
         issue.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        issue.assignee.toLowerCase().includes(searchTerm.toLowerCase()) ||
         issue.tags.some(tag =>
           tag.toLowerCase().includes(searchTerm.toLowerCase())
         );
@@ -223,12 +117,12 @@ export const BoardPage = () => {
   };
 
   return (
-    <div style={{paddingTop:'1rem'}}>
-      {/* 🔍 Search & Filter Controls */}
-      <div style={{ display: 'flex', gap: '1rem', marginBottom: '1rem' }}>
+    <div className="boardPageContainer" >
+      {/* Search & Filter Controls */}
+      <div className="searchandFilter" >
         <input
           type="text"
-          placeholder="Search by title, assignee, or tag"
+          placeholder="Search by title or tag"
           value={searchTerm}
           onChange={e => setSearchTerm(e.target.value)}
           className="searchBox"
@@ -245,25 +139,19 @@ export const BoardPage = () => {
         </select>
       </div>
 
-      {/* 🛑 Undo Notification */}
+      {/* Undo Notification */}
       {showUndo && (
         <div
-          className="undo-banner"
-          style={{
-            marginBottom: '1rem',
-            background: '#fff3cd',
-            padding: '10px',
-            border: '1px solid #ffeeba',
-          }}
+          className="undoBanner"
         >
           <span>Issue moved. </span>
-          <button onClick={handleUndo} style={{ marginLeft: '1rem' }}>
+          <button onClick={handleUndo} className='undoButton'>
             Undo
           </button>
         </div>
       )}
 
-      {/* 🧩 Kanban Board with DnD */}
+      {/* Kanban Board with DnD */}
       <div className="kanbanBoard">
         <DndContext
           sensors={sensors}
@@ -277,6 +165,7 @@ export const BoardPage = () => {
               status={status}
               issues={getFilteredIssues(status)}
               isDraggingGlobal={isDragging}
+              isAdmin={currentUser.role === "admin"}
             />
           ))}
         </DndContext>
