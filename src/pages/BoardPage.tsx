@@ -19,6 +19,9 @@ import { mockUpdateIssue } from '../utils/api';
 import { toast } from 'react-toastify';
 import { useIssueContext } from '../components/IssueContext';
 
+import { useMockInsertIssues } from '../hooks/updateIssue';
+
+
 
 
 const statusList: IssueStatus[] = ['Backlog', 'In Progress', 'Done'];
@@ -26,6 +29,7 @@ const statusList: IssueStatus[] = ['Backlog', 'In Progress', 'Done'];
 
 export const BoardPage = () => {
   const { issues, setIssues } = useIssueContext();
+  useMockInsertIssues(); 
 
   const [searchTerm, setSearchTerm] = useState('');
   const [priorityFilter, setPriorityFilter] = useState('');

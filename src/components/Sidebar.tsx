@@ -1,18 +1,15 @@
 import React, { useEffect, useState } from 'react';
+import { Issue, IssueStatus } from '../types';
+import { useIssueContext } from './IssueContext';
 
-interface Issue {
-  id: string;
-  title: string;
-  status: 'Backlog' | 'In Progress' | 'Done';
-}
-
-const statusColors: Record<Issue['status'], string> = {
+const statusColors: Record<IssueStatus, string> = {
   'Backlog': '#f8d7da',       // light red
   'In Progress': '#fff3cd', // light yellow
   'Done': '#d4edda',          // light green
 };
 
 export const Sidebar: React.FC = () => {
+  const {lastUpdated} = useIssueContext()
   const [issues, setIssues] = useState<Issue[]>([]);
 
 
@@ -71,6 +68,7 @@ export const Sidebar: React.FC = () => {
           ))}
         </ul>
       )}
+      <div style={{position:"fixed", bottom:'50px'}}>Updated at: {new Date(Number(lastUpdated)).toLocaleString()}</div>
     </div>
   );
 };

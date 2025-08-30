@@ -24,3 +24,13 @@ export interface DropableColumnInterface {
       isDraggingGlobal: boolean;
       isAdmin:boolean
     }
+
+
+export interface ContextType {
+  issues: Issue[];
+  setIssues: React.Dispatch<React.SetStateAction<Issue[]>>;
+  localIssues: Issue[];
+  setLocalIssues: React.Dispatch<React.SetStateAction<Issue[]>>;
+  lastUpdated: String,
+  setLastUpdated:React.Dispatch<React.SetStateAction<string>>
+}

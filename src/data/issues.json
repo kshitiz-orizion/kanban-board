@@ -28,35 +28,6 @@
     "createdAt": "2025-07-07T09:30:00Z",
     "assignee": "carol",
     "tags": ["ui"]
-  },
-   {
-    "id": "4",
-    "title": "blank4",
-    "status": "In Progress",
-    "priority": "low",
-    "severity": 1,
-    "createdAt": "2025-07-07T09:30:00Z",
-    "assignee": "carol",
-    "tags": ["ui"]
-  },
-  {
-    "id": "5",
-    "title": "blank5",
-    "status": "Done",
-    "priority": "low",
-    "severity": 1,
-    "createdAt": "2025-07-07T09:30:00Z",
-    "assignee": "carol",
-    "tags": ["ui"]
-  },
-  {
-    "id": "6",
-    "title": "blank6",
-    "status": "Backlog",
-    "priority": "low",
-    "severity": 1,
-    "createdAt": "2025-07-07T09:30:00Z",
-    "assignee": "carol",
-    "tags": ["ui"]
   }
+
 ]

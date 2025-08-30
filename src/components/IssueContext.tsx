@@ -2,32 +2,34 @@
 import React, { createContext, useContext, useState, useEffect } from 'react';
 import { mockFetchIssues } from '../utils/api';
 import { toast } from 'react-toastify';
+import { Issue, ContextType } from '../types';
+import { usePolling } from '../hooks/polling';
 
-export interface Issue {
-  id: string;
-  title: string;
-  status: 'Backlog' | 'In Progress' | 'Done';
-  priority: 'low' | 'medium' | 'high';
-  severity: number;
-  createdAt: string;
-  assignee: string;
-  tags: string[];
-}
-
-
-interface ContextType {
-  issues: Issue[];
-  setIssues: React.Dispatch<React.SetStateAction<Issue[]>>;
-}
 
 const Context = createContext<ContextType | undefined>(undefined);
 
 export const Provider = ({ children }: { children: React.ReactNode }) => {
   const [issues, setIssues] = useState<Issue[]>([]);
+  const [localIssues,setLocalIssues] = useState<Issue[]>([]);
+  const [lastUpdated,setLastUpdated] = useState('');
 
   useEffect(() => {
       fetchData();
     }, []);
+
+  usePolling(() => {
+  fetchNewPollData();
+}, 10000);
+
+const fetchNewPollData = () =>{
+  const data = [...issues]
+  const filteredServerIssues = data.filter(
+      (issue) => !localIssues.some(local => local.id === issue.id)
+    );
+  setIssues([...filteredServerIssues, ...localIssues]);
+  setLastUpdated(Date.now().toString())
+  // setIssues((prev)=>[...prev,...localIssues])
+}
   
     const fetchData = async () => {
       try {
@@ -39,7 +41,7 @@ export const Provider = ({ children }: { children: React.ReactNode }) => {
     };
   
   return (
-    <Context.Provider value={{ issues, setIssues }}>
+    <Context.Provider value={{ issues, setIssues, localIssues,setLocalIssues, lastUpdated,setLastUpdated }}>
       {children}
     </Context.Provider>
   );
