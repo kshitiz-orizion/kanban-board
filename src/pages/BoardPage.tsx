@@ -15,6 +15,8 @@ import {
 import { mockFetchIssues, mockUpdateIssue } from '../utils/api';
 import { useNavigate } from 'react-router-dom';
 import { toast } from 'react-toastify';
+import { useIssueContext } from '../components/IssueContext';
+
 
 interface Issue {
   id: string;
@@ -49,10 +51,10 @@ const DraggableCard = ({
     cursor: 'grab',
     borderTop: `2px solid ${
       issue.status === 'Done'
-        ? 'green'
+        ? '#008000'
         : issue.status === 'Backlog'
-        ? 'red'
-        : 'orange'
+        ? '#FF0000'
+        : '#FFA500'
     }`,
   };
 
@@ -127,7 +129,9 @@ const DroppableColumn = ({
 };
 
 export const BoardPage = () => {
-  const [issues, setIssues] = useState<Issue[]>([]);
+  // const [issues, setIssues] = useState<Issue[]>([]);
+  const { issues, setIssues } = useIssueContext();
+
   const [searchTerm, setSearchTerm] = useState('');
   const [priorityFilter, setPriorityFilter] = useState('');
   const [isDragging, setIsDragging] = useState(false);
@@ -136,18 +140,7 @@ export const BoardPage = () => {
   const [showUndo, setShowUndo] = useState(false);
   const undoTimer = useRef<NodeJS.Timeout | null>(null);
 
-  useEffect(() => {
-    fetchData();
-  }, []);
 
-  const fetchData = async () => {
-    try {
-      const data: Issue[]|any = await mockFetchIssues();
-      setIssues(data);
-    } catch (error) {
-      toast("Failed to load issues");
-    }
-  };
 
   const pointerSensor = useSensor(PointerSensor, {
     activationConstraint: { distance: 0.01 },
@@ -230,7 +223,7 @@ export const BoardPage = () => {
   };
 
   return (
-    <div style={{ padding: '1rem' }}>
+    <div style={{paddingTop:'1rem'}}>
       {/* 🔍 Search & Filter Controls */}
       <div style={{ display: 'flex', gap: '1rem', marginBottom: '1rem' }}>
         <input
@@ -245,7 +238,7 @@ export const BoardPage = () => {
           onChange={e => setPriorityFilter(e.target.value)}
           className="priorityFilter"
         >
-          <option value="">All Priorities</option>
+          <option value="">All Severity</option>
           <option value="high">High</option>
           <option value="medium">Medium</option>
           <option value="low">Low</option>

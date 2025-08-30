@@ -6,10 +6,15 @@ import { BoardPage } from './pages/BoardPage';
 import { IssueDetailPage } from './pages/IssueDetailPage';
 import { SettingsPage } from './pages/SettingsPage';
 import { Navigation } from './components/Navigation';
+import { Sidebar } from './components/Sidebar'
 
 export const App = () => {
 
   return (
+    <div style={{display:"flex"}}>
+      
+    <Sidebar/>
+    <div style={{flex:1,flexDirection:"column",minHeight:'100vh', display:"flex"}}>
       <Router>
         <Navigation />
         <Routes>
@@ -19,5 +24,8 @@ export const App = () => {
           <Route path="*" element={<Navigate to="/board" />} />
         </Routes>
       </Router>
+      </div>
+      </div>
+      
   );
 }
