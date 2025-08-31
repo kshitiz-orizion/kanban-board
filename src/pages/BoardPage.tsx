@@ -1,4 +1,4 @@
-import React, { useState, useRef } from 'react';
+import React, { useState, useRef, useEffect } from 'react';
 import { Issue, IssueStatus } from '../types'
 import {
   DndContext,
@@ -19,7 +19,7 @@ import { mockUpdateIssue } from '../utils/api';
 import { toast } from 'react-toastify';
 import { useIssueContext } from '../components/IssueContext';
 
-import { useMockInsertIssues } from '../hooks/updateIssue';
+import { useMockInsertIssues } from '../hooks/useMockInsertIssue';
 
 
 
@@ -29,7 +29,7 @@ const statusList: IssueStatus[] = ['Backlog', 'In Progress', 'Done'];
 
 export const BoardPage = () => {
   const { issues, setIssues } = useIssueContext();
-  useMockInsertIssues(); 
+    useMockInsertIssues()
 
   const [searchTerm, setSearchTerm] = useState('');
   const [priorityFilter, setPriorityFilter] = useState('');

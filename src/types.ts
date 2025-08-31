@@ -10,6 +10,7 @@ export interface Issue {
     createdAt: string;
     assignee: string;
     tags: string[];
+    isLocal ?:boolean
 }
 
 export interface DragableCard {
@@ -32,5 +33,7 @@ export interface ContextType {
   localIssues: Issue[];
   setLocalIssues: React.Dispatch<React.SetStateAction<Issue[]>>;
   lastUpdated: String,
-  setLastUpdated:React.Dispatch<React.SetStateAction<string>>
+  setLastUpdated:React.Dispatch<React.SetStateAction<string>>;
+  counter: number,
+  setCounter : React.Dispatch<React.SetStateAction<number>>;
 }

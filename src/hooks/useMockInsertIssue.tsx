@@ -3,10 +3,13 @@ import { useEffect } from 'react';
 import { Issue } from '../types';
 import { useIssueContext } from '../components/IssueContext';
 
-let counter = 1000; // ensure unique IDs
+//  let counter = 1000; // ensure unique IDs
 
-const generateMockIssue = (): Issue => ({
-    id: String(counter++),
+const generateMockIssue = (counter:number): Issue => {
+
+    // const newCounter=counter+1;
+    return {
+    id: String(counter),
     title: `New Issue #${counter}`,
     status: ['Backlog', 'In Progress', 'Done'][Math.floor(Math.random() * 3)] as Issue['status'],
     priority: ['low', 'medium', 'high'][Math.floor(Math.random() * 3)] as Issue['priority'],
@@ -14,24 +17,24 @@ const generateMockIssue = (): Issue => ({
     createdAt: new Date().toISOString(),
     assignee: 'Bot generated issue',
     tags: ['auto', 'generated'],
-});
+}
+};
 
-export const useMockInsertIssues = (interval = 5000, chance = 0.5) => {
-    const { setLocalIssues } = useIssueContext();
-
+export const useMockInsertIssues = (interval = 10000, chance = 0.5) => {
+    const { setLocalIssues,counter,setCounter } = useIssueContext();
     useEffect(() => {
         const id = setInterval(() => {
             if (Math.random() < chance) {
                 const newIssue = {
-                    ...generateMockIssue(),
-                    isLocal: true,
+                    ...generateMockIssue(counter),
+                     isLocal: true,
                 };
-
                 setLocalIssues(prev => [...prev, newIssue]);
-                console.log('🆕 Mock issue inserted:', newIssue);
+                setCounter(counter+1)
+                console.log(counter,'Mock issue inserted:', newIssue);
             }
         }, interval);
 
         return () => clearInterval(id);
-    }, [setLocalIssues, interval, chance]);
+    }, [setLocalIssues, interval, chance,counter]);
 };

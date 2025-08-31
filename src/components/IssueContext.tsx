@@ -12,7 +12,8 @@ export const Provider = ({ children }: { children: React.ReactNode }) => {
   const [issues, setIssues] = useState<Issue[]>([]);
   const [localIssues,setLocalIssues] = useState<Issue[]>([]);
   const [lastUpdated,setLastUpdated] = useState('');
-
+  const [counter,setCounter] = useState<number>(1000);
+  // console.log("provider updated")
   useEffect(() => {
       fetchData();
     }, []);
@@ -27,6 +28,7 @@ const fetchNewPollData = () =>{
       (issue) => !localIssues.some(local => local.id === issue.id)
     );
   setIssues([...filteredServerIssues, ...localIssues]);
+  setLocalIssues([])
   setLastUpdated(Date.now().toString())
   // setIssues((prev)=>[...prev,...localIssues])
 }
@@ -41,7 +43,7 @@ const fetchNewPollData = () =>{
     };
   
   return (
-    <Context.Provider value={{ issues, setIssues, localIssues,setLocalIssues, lastUpdated,setLastUpdated }}>
+    <Context.Provider value={{ issues, setIssues, localIssues,setLocalIssues, lastUpdated,setLastUpdated, counter,setCounter }}>
       {children}
     </Context.Provider>
   );

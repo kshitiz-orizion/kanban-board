@@ -7,12 +7,13 @@ import { IssueDetailPage } from './pages/IssueDetailPage';
 import { SettingsPage } from './pages/SettingsPage';
 import { Navigation } from './components/Navigation';
 import { Sidebar } from './components/Sidebar'
+import { ToastContainer } from 'react-toastify';
 
 export const App = () => {
 
   return (
     <div style={{display:"flex"}}>
-      
+    <ToastContainer position="bottom-left" />
     <Sidebar/>
     <div style={{flex:1,flexDirection:"column",minHeight:'100vh', display:"flex"}}>
       <Router>

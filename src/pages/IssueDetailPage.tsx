@@ -1,7 +1,7 @@
 // IssueDetailPage.tsx
 import React, { useEffect } from 'react';
 import { useParams, Link } from 'react-router-dom';
-import { useIssueContext } from '../components/IssueContext'; // ⬅️ Import context
+import { useIssueContext } from '../components/IssueContext'; //  Import context
 import { currentUser } from '../constants/currentUser';
 
 export const IssueDetailPage: React.FC = () => {
@@ -9,7 +9,7 @@ export const IssueDetailPage: React.FC = () => {
   const { issues, setIssues } = useIssueContext(); // ⬅️ Access context
   const issue = issues.find((issue) => issue.id === id);
 
-  // 🔁 Save to localStorage if it doesn't exist
+  // Save to localStorage if it doesn't exist
   useEffect(() => {
     if (!issue) return;
 
@@ -21,7 +21,7 @@ export const IssueDetailPage: React.FC = () => {
     if (!exists) {
       viewedIssues.push(issue);
 
-      // ✅ Keep only the last 5
+      // Keep only the last 5
       if (viewedIssues.length > 5) {
         viewedIssues = viewedIssues.slice(viewedIssues.length - 5);
       }
@@ -31,9 +31,10 @@ export const IssueDetailPage: React.FC = () => {
     }
   }, [issue]);
 
-  // ✅ Handler to mark issue as resolved
+  //Handler to mark issue as resolved
   const markAsResolved = () => {
     if (!issue) return;
+    // console.log(issue.isLocal)
     setIssues((prev) =>
       prev.map((i) =>
         i.id === issue.id ? { ...i, status: 'Done' } : i
@@ -59,7 +60,7 @@ export const IssueDetailPage: React.FC = () => {
         position: 'relative', // ⬅️ Important for positioning the button
       }}
     >
-      {/* ✅ Top-right Resolved Button */}
+      {/* Top-right Resolved Button */}
       <button
         onClick={markAsResolved}
         style={{
