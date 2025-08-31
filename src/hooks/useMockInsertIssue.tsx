@@ -19,6 +19,7 @@ const generateMockIssue = (counter:number): Issue => {
     tags: ['auto', 'generated'],
 }
 };
+// inserts bot generated issues with 50% chance in 10 seconds
 
 export const useMockInsertIssues = (interval = 10000, chance = 0.5) => {
     const { setLocalIssues,counter,setCounter } = useIssueContext();

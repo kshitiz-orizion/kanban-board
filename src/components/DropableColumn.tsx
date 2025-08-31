@@ -27,7 +27,7 @@ const DroppableColumn = ({
           />
         ))
       ) : (
-        <p style={{ color: '#aaa', fontStyle: 'italic' }}>
+        <p className="emptyIssues">
           No matching issues
         </p>
       )}

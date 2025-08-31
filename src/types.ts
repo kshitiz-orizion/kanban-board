@@ -10,7 +10,8 @@ export interface Issue {
     createdAt: string;
     assignee: string;
     tags: string[];
-    isLocal ?:boolean
+    isLocal ?:boolean;
+    score ?:number;
 }
 
 export interface DragableCard {
@@ -36,4 +37,6 @@ export interface ContextType {
   setLastUpdated:React.Dispatch<React.SetStateAction<string>>;
   counter: number,
   setCounter : React.Dispatch<React.SetStateAction<number>>;
+  pollInterval:number|''
+  setPollInterval:React.Dispatch<React.SetStateAction<number | ''>>
 }

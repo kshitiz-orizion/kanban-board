@@ -2,3 +2,5 @@ export const currentUser = {
     name: 'Alice',
     role: 'admin' // or 'contributor'
 };
+
+export const userDefinedRank = 1

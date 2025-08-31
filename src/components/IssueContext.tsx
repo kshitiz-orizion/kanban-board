@@ -4,6 +4,7 @@ import { mockFetchIssues } from '../utils/api';
 import { toast } from 'react-toastify';
 import { Issue, ContextType } from '../types';
 import { usePolling } from '../hooks/polling';
+import { sortIssues } from '../utils/sorting';
 
 
 const Context = createContext<ContextType | undefined>(undefined);
@@ -13,21 +14,26 @@ export const Provider = ({ children }: { children: React.ReactNode }) => {
   const [localIssues,setLocalIssues] = useState<Issue[]>([]);
   const [lastUpdated,setLastUpdated] = useState('');
   const [counter,setCounter] = useState<number>(1000);
-  // console.log("provider updated")
+  const [pollInterval,setPollInterval]= useState<number|''>(10);
+  
+  const pollValue = Number(pollInterval) || 0
   useEffect(() => {
       fetchData();
     }, []);
 
   usePolling(() => {
+    console.log("===called====?")
   fetchNewPollData();
-}, 10000);
+},  pollValue * 1000);
 
 const fetchNewPollData = () =>{
   const data = [...issues]
   const filteredServerIssues = data.filter(
       (issue) => !localIssues.some(local => local.id === issue.id)
     );
-  setIssues([...filteredServerIssues, ...localIssues]);
+  const unsortedIssue = [...filteredServerIssues,...localIssues];
+  const sortedIssue = sortIssues(unsortedIssue)
+  setIssues([...sortedIssue]);
   setLocalIssues([])
   setLastUpdated(Date.now().toString())
   // setIssues((prev)=>[...prev,...localIssues])
@@ -36,14 +42,15 @@ const fetchNewPollData = () =>{
     const fetchData = async () => {
       try {
         const data: Issue[]|any = await mockFetchIssues();
-        setIssues(data);
+        const sortedIssue = sortIssues(data)
+        setIssues([...sortedIssue]);
       } catch (error) {
         toast("Failed to load issues");
       }
     };
   
   return (
-    <Context.Provider value={{ issues, setIssues, localIssues,setLocalIssues, lastUpdated,setLastUpdated, counter,setCounter }}>
+    <Context.Provider value={{ issues, setIssues, localIssues,setLocalIssues, lastUpdated,setLastUpdated, counter,setCounter,pollInterval,setPollInterval }}>
       {children}
     </Context.Provider>
   );

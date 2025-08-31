@@ -20,13 +20,14 @@ import { toast } from 'react-toastify';
 import { useIssueContext } from '../components/IssueContext';
 
 import { useMockInsertIssues } from '../hooks/useMockInsertIssue';
+import { sortIssues } from '../utils/sorting';
 
 const statusList: IssueStatus[] = ['Backlog', 'In Progress', 'Done'];
 
 // Helper to show undo toast with button, dismisses previous undo toast if any
 const showUndoToast = (
   handleUndo: () => void,
-  undoToastIdRef: React.RefObject<string|number | null>
+  undoToastIdRef: React.RefObject<string | number | null>
 ) => {
   if (undoToastIdRef.current !== null) {
     toast.dismiss(undoToastIdRef.current);
@@ -34,21 +35,14 @@ const showUndoToast = (
 
   undoToastIdRef.current = toast(
     ({ closeToast }) => (
-      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+      <div className='toastContainer'>
         <span>Issue moved.</span>
         <button
           onClick={() => {
             handleUndo();
             closeToast();
           }}
-          style={{
-            background: 'transparent',
-            border: 'none',
-            color: '#007bff',
-            cursor: 'pointer',
-            fontWeight: 'bold',
-            marginLeft: '1rem',
-          }}
+          className='taostButton'
         >
           Undo
         </button>
@@ -102,9 +96,15 @@ export const BoardPage = () => {
       setPreviousIssues(issues);
       previousIssuesRef.current = issues;
 
-      setIssues(prev =>
-        prev.map(issue => (issue.id === issueId ? { ...issue, status: newStatus } : issue))
-      );
+      setIssues(prev => {
+        const updated = prev.map(issue =>
+          issue.id === issueId ? { ...issue, status: newStatus } : issue
+        );
+
+        const sorted = sortIssues(updated);
+        return sorted;
+      });
+
 
       // Show undo toast, dismissing any existing one
       showUndoToast(handleUndo, undoToastId);

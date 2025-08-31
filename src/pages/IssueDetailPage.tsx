@@ -44,7 +44,7 @@ export const IssueDetailPage: React.FC = () => {
 
   if (!issue) {
     return (
-      <div style={{ padding: '1rem' }}>
+      <div className='noissueFound'>
         <h2>Issue not found</h2>
         <Link to="/">Back to Board</Link>
       </div>
@@ -53,25 +53,14 @@ export const IssueDetailPage: React.FC = () => {
 
   return (
     <div
-      style={{
-        padding: '1rem',
-        backgroundColor: '#f4f5f7',
-        minHeight: '100vh',
-        position: 'relative', // ⬅️ Important for positioning the button
-      }}
+      className='issueContainer'
     >
       {/* Top-right Resolved Button */}
       <button
         onClick={markAsResolved}
+        className='resolveButton'
         style={{
-          position: 'absolute',
-          top: '1rem',
-          right: '1rem',
           backgroundColor: issue.status === 'Done' ? '#28a745' : '#007bff',
-          color: 'white',
-          border: 'none',
-          padding: '8px 12px',
-          borderRadius: '5px',
           cursor: issue.status === 'Done' || currentUser.role !== "admin" ? 'not-allowed' : 'pointer',
           opacity: issue.status === 'Done' ? 0.6 : 1,
         }}
@@ -80,7 +69,7 @@ export const IssueDetailPage: React.FC = () => {
         {issue.status === 'Done' ? 'Resolved' : 'Mark as Resolved'}
       </button>
 
-      <div className="mainPage" style={{ maxWidth: '600px', margin: 'auto', borderTop: '2px solid green' }}>
+      <div className="mainPage" style={{ borderTop: `2px solid ${issue.status === "Done" ? '#008000' : issue.status ==='Backlog' ? '#ff0000':'#ffa500'}` }}>
         <h2>{issue.title}</h2>
         <p><strong>Status:</strong> {issue.status}</p>
         <p>
@@ -96,18 +85,14 @@ export const IssueDetailPage: React.FC = () => {
                   )
                 );
               }}
-              style={{
-                padding: '4px',
-                marginLeft: '10px',
-                fontSize: '0.95rem',
-              }}
+              className='dropDown'
             >
               <option value="low">Low</option>
               <option value="medium">Medium</option>
               <option value="high">High</option>
             </select>
           ) : (
-            <span style={{ marginLeft: '10px' }}>{issue.priority}</span>
+            <span className='readablePriority'>{issue.priority}</span>
           )}
         </p>
 
@@ -116,22 +101,13 @@ export const IssueDetailPage: React.FC = () => {
         <p><strong>Assignee:</strong> {issue.assignee}</p>
         <p><strong>Created At:</strong> {new Date(issue.createdAt).toLocaleString()}</p>
 
-        <div className="tags" style={{ marginTop: '10px', display: 'flex' }}>
-          <strong style={{ marginRight: '10px' }}>Tags:</strong>
+        <div className="tags tagContainer">
+          <strong className='tagHeading'>Tags:</strong>
           <div>
             {issue.tags.map((tag) => (
               <span
                 key={tag}
                 className="tag"
-                style={{
-                  display: 'inline-block',
-                  backgroundColor: '#007bff',
-                  color: '#fff',
-                  padding: '2px 6px',
-                  borderRadius: '4px',
-                  fontSize: '0.8em',
-                  marginRight: '4px',
-                }}
               >
                 {tag}
               </span>

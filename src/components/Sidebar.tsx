@@ -9,58 +9,48 @@ const statusColors: Record<IssueStatus, string> = {
 };
 
 export const Sidebar: React.FC = () => {
-  const {lastUpdated} = useIssueContext()
+  const { lastUpdated } = useIssueContext()
   const [issues, setIssues] = useState<Issue[]>([]);
 
 
   useEffect(() => {
-  const loadIssues = () => {
-    const stored = localStorage.getItem('viewedIssues');
-    if (stored) {
-      try {
-        const parsed = JSON.parse(stored) as Issue[];
-        setIssues(parsed);
-      } catch (e) {
-        console.error('Invalid localStorage data:', e);
+    const loadIssues = () => {
+      const stored = localStorage.getItem('viewedIssues');
+      if (stored) {
+        try {
+          const parsed = JSON.parse(stored) as Issue[];
+          setIssues(parsed);
+        } catch (e) {
+          console.error('Invalid localStorage data:', e);
+        }
       }
-    }
-  };
+    };
 
-  loadIssues(); // Initial load
+    loadIssues(); // Initial load
 
-  // 🔔 Listen for updates
-  const handleUpdate = () => loadIssues();
-  window.addEventListener('viewedIssuesUpdated', handleUpdate);
+    // 🔔 Listen for updates
+    const handleUpdate = () => loadIssues();
+    window.addEventListener('viewedIssuesUpdated', handleUpdate);
 
-  return () => {
-    window.removeEventListener('viewedIssuesUpdated', handleUpdate);
-  };
-}, []);
+    return () => {
+      window.removeEventListener('viewedIssuesUpdated', handleUpdate);
+    };
+  }, []);
 
 
   return (
-    <div style={{
-      width: '250px',
-      padding: '1rem',
-      backgroundColor: '#f0f0f0',
-      borderRight: '1px solid #ccc',
-      overflowY: 'auto'
-    }}>
+    <div className='sideBarContainer' >
       <h3>Recenly viewed issues</h3>
       {issues.length === 0 ? (
-        <p style={{ fontStyle: 'italic', color: '#666' }}>No issues viewed yet</p>
+        <p className='emptyIssues'>No issues viewed yet</p>
       ) : (
-        <ul style={{ listStyle: 'none', padding: 0 }}>
+        <ul className="issueList">
           {issues.map(issue => (
             <li
               key={issue.id}
+              className='issueItem'
               style={{
-                marginBottom: '0.5rem',
-                padding: '0.5rem',
                 backgroundColor: statusColors[issue.status],
-                borderRadius: '4px',
-                fontWeight: 'bold',
-                cursor: 'pointer'
               }}
             >
               {issue.title}
@@ -68,7 +58,7 @@ export const Sidebar: React.FC = () => {
           ))}
         </ul>
       )}
-      <div style={{position:"fixed", bottom:'50px'}}>Updated at: {lastUpdated ? new Date(Number(lastUpdated)).toLocaleString() : new Date(Date.now()).toLocaleString()}</div>
+      <div  className="dateTime" >{lastUpdated ? new Date(Number(lastUpdated)).toLocaleString() : new Date(Date.now()).toLocaleString()}</div>
     </div>
   );
 };
