@@ -1,5 +1,5 @@
-import React, { useState, useRef, useEffect } from 'react';
-import { Issue, IssueStatus } from '../types'
+import React, { useState, useRef } from 'react';
+import { Issue, IssueStatus } from '../types';
 import {
   DndContext,
   DragEndEvent,
@@ -13,7 +13,7 @@ import {
 
 import DroppableColumn from '../components/DropableColumn';
 
-import { currentUser } from '../constants/currentUser'
+import { currentUser } from '../constants/currentUser';
 import { mockUpdateIssue } from '../utils/api';
 
 import { toast } from 'react-toastify';
@@ -21,25 +21,60 @@ import { useIssueContext } from '../components/IssueContext';
 
 import { useMockInsertIssues } from '../hooks/useMockInsertIssue';
 
-
-
-
 const statusList: IssueStatus[] = ['Backlog', 'In Progress', 'Done'];
 
+// Helper to show undo toast with button, dismisses previous undo toast if any
+const showUndoToast = (
+  handleUndo: () => void,
+  undoToastIdRef: React.RefObject<string|number | null>
+) => {
+  if (undoToastIdRef.current !== null) {
+    toast.dismiss(undoToastIdRef.current);
+  }
+
+  undoToastIdRef.current = toast(
+    ({ closeToast }) => (
+      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+        <span>Issue moved.</span>
+        <button
+          onClick={() => {
+            handleUndo();
+            closeToast();
+          }}
+          style={{
+            background: 'transparent',
+            border: 'none',
+            color: '#007bff',
+            cursor: 'pointer',
+            fontWeight: 'bold',
+            marginLeft: '1rem',
+          }}
+        >
+          Undo
+        </button>
+      </div>
+    ),
+    {
+      autoClose: 5000,
+      pauseOnHover: true,
+      closeOnClick: false,
+      draggable: false,
+      position: 'top-right',
+    }
+  );
+};
 
 export const BoardPage = () => {
   const { issues, setIssues } = useIssueContext();
-    useMockInsertIssues()
+  useMockInsertIssues();
 
   const [searchTerm, setSearchTerm] = useState('');
   const [priorityFilter, setPriorityFilter] = useState('');
   const [isDragging, setIsDragging] = useState(false);
   const [previousIssues, setPreviousIssues] = useState<Issue[] | null>(null);
   const previousIssuesRef = useRef<Issue[] | null>(null);
-  const [showUndo, setShowUndo] = useState(false);
   const undoTimer = useRef<NodeJS.Timeout | null>(null);
-
-
+  const undoToastId = React.useRef<number | string | null>(null);
 
   const pointerSensor = useSensor(PointerSensor, {
     activationConstraint: { distance: 0.01 },
@@ -48,12 +83,7 @@ export const BoardPage = () => {
   const touchSensor = useSensor(TouchSensor);
   const keyboardSensor = useSensor(KeyboardSensor);
 
-  const sensors = useSensors(
-    mouseSensor,
-    touchSensor,
-    keyboardSensor,
-    pointerSensor
-  );
+  const sensors = useSensors(mouseSensor, touchSensor, keyboardSensor, pointerSensor);
 
   const handleDragStart = () => {
     setIsDragging(true);
@@ -66,29 +96,30 @@ export const BoardPage = () => {
     if (!over) return;
 
     const issueId = active.id as string;
-    const newStatus = over.id as Issue['status'];
+    const newStatus = over.id as IssueStatus;
 
     if (newStatus) {
       setPreviousIssues(issues);
       previousIssuesRef.current = issues;
 
       setIssues(prev =>
-        prev.map(issue =>
-          issue.id === issueId ? { ...issue, status: newStatus } : issue
-        )
+        prev.map(issue => (issue.id === issueId ? { ...issue, status: newStatus } : issue))
       );
 
-      setShowUndo(true);
+      // Show undo toast, dismissing any existing one
+      showUndoToast(handleUndo, undoToastId);
+
       if (undoTimer.current) clearTimeout(undoTimer.current);
       undoTimer.current = setTimeout(async () => {
         try {
           await mockUpdateIssue(issueId, { status: newStatus });
-          setShowUndo(false);
           setPreviousIssues(null);
           previousIssuesRef.current = null;
+          // Clear toast ID after update success
+          undoToastId.current = null;
         } catch (e) {
           handleUndo();
-          toast("Something went wrong");
+          toast('Something went wrong');
         }
       }, 5000);
     }
@@ -99,8 +130,12 @@ export const BoardPage = () => {
       setIssues(previousIssuesRef.current);
       setPreviousIssues(null);
       previousIssuesRef.current = null;
-      setShowUndo(false);
       if (undoTimer.current) clearTimeout(undoTimer.current);
+      // Dismiss undo toast if still visible
+      if (undoToastId.current !== null) {
+        toast.dismiss(undoToastId.current);
+        undoToastId.current = null;
+      }
     }
   };
 
@@ -110,20 +145,17 @@ export const BoardPage = () => {
       const matchesSearch =
         searchTerm.trim() === '' ||
         issue.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        issue.tags.some(tag =>
-          tag.toLowerCase().includes(searchTerm.toLowerCase())
-        );
-      const matchesPriority =
-        !priorityFilter || issue.priority === priorityFilter;
+        issue.tags.some(tag => tag.toLowerCase().includes(searchTerm.toLowerCase()));
+      const matchesPriority = !priorityFilter || issue.priority === priorityFilter;
 
       return matchesStatus && matchesSearch && matchesPriority;
     });
   };
 
   return (
-    <div className="boardPageContainer" >
+    <div className="boardPageContainer">
       {/* Search & Filter Controls */}
-      <div className="searchandFilter" >
+      <div className="searchandFilter">
         <input
           type="text"
           placeholder="Search by title or tag"
@@ -143,18 +175,6 @@ export const BoardPage = () => {
         </select>
       </div>
 
-      {/* Undo Notification */}
-      {showUndo && (
-        <div
-          className="undoBanner"
-        >
-          <span>Issue moved. </span>
-          <button onClick={handleUndo} className='undoButton'>
-            Undo
-          </button>
-        </div>
-      )}
-
       {/* Kanban Board with DnD */}
       <div className="kanbanBoard">
         <DndContext
@@ -169,7 +189,7 @@ export const BoardPage = () => {
               status={status}
               issues={getFilteredIssues(status)}
               isDraggingGlobal={isDragging}
-              isAdmin={currentUser.role === "admin"}
+              isAdmin={currentUser.role === 'admin'}
             />
           ))}
         </DndContext>

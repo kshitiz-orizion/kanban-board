@@ -68,7 +68,7 @@ export const Sidebar: React.FC = () => {
           ))}
         </ul>
       )}
-      <div style={{position:"fixed", bottom:'50px'}}>Updated at: {lastUpdated ? new Date(Number(lastUpdated)).toLocaleString() : new Date(Date.now()).toLocaleDateString()}</div>
+      <div style={{position:"fixed", bottom:'50px'}}>Updated at: {lastUpdated ? new Date(Number(lastUpdated)).toLocaleString() : new Date(Date.now()).toLocaleString()}</div>
     </div>
   );
 };

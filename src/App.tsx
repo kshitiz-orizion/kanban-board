@@ -13,7 +13,7 @@ export const App = () => {
 
   return (
     <div style={{display:"flex"}}>
-    <ToastContainer position="bottom-left" />
+    <ToastContainer position="top-right" />
     <Sidebar/>
     <div style={{flex:1,flexDirection:"column",minHeight:'100vh', display:"flex"}}>
       <Router>
